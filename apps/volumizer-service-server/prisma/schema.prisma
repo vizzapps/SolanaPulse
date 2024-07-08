@@ -1,0 +1,51 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model BotSchedule {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  status    String?
+  runAt     DateTime?
+  trade     Trade?    @relation(fields: [tradeId], references: [id])
+  tradeId   String?   @db.ObjectId
+}
+
+model Trade {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  duration       Int?
+  numberOfTrades Int?
+  amount         Int?
+  botSchedules   BotSchedule[]
+  token          Token?        @relation(fields: [tokenId], references: [id])
+  tokenId        String?       @db.ObjectId
+}
+
+model Token {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  address   String?
+  name      String?
+  trades    Trade[]
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  firstName String?
+  lastName  String?
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  roles     Json
+}
